@@ -27,15 +27,22 @@ class UrlParse(object):
             a_href = dt.find("a").attrs.get("href", None)
             if a_href:
                 img_list.append(a_href)
-        for img in self.div_tovar.findAll("img"):
+
+        # for img in self.div_tovar.findAll("img"):
+        #     img_src = img.attrs.get("src", None)
+        #     if "/wp-content/" in img_src:
+        #         img_list.append(img_src)
+        #
+        #     img_srcset = img.attrs.get("srcset", None)
+        #     if img_srcset is not None:
+        #         for srcset_item in re.findall(r'(https?://\S+)', img_srcset):
+        #             img_list.append(srcset_item)
+
+        for img in self.div_tovar.find_all("img", {"class": ["aligncenter", "size-full"]}):
             img_src = img.attrs.get("src", None)
             if "/wp-content/" in img_src:
                 img_list.append(img_src)
 
-            img_srcset = img.attrs.get("srcset", None)
-            if img_srcset is not None:
-                for srcset_item in re.findall(r'(https?://\S+)', img_srcset):
-                    img_list.append(srcset_item)
         return img_list
 
     @staticmethod
@@ -100,7 +107,7 @@ class UrlParse(object):
                     else:
                         row[body_pattern[0]] = ""
 
-        row["Картинки"] = "{}".format("\n".join(self.get_images_list()[1:]))
+        row["Картинки"] = "{}".format(",".join(self.get_images_list()[1:]))
 
         description = ""
         for line in self.div_tovar.find_all("p"):
