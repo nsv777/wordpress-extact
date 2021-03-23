@@ -5,14 +5,6 @@ from common.excel_file import ExcelFile
 from common.url_parse import UrlParse
 from common.utils import get_basic_dirpath
 
-BODY_PATTERNS = (
-    ("Цвет", "^Цвет: (.*)$"),
-    ("Размер", "^Размер, мм: (.*)$"),
-    ("Планировка", "^Планировка: (.*)$"),
-    ("Материал", "^Материал: (.*)$"),
-    ("Цена", "^Цена: (.*)$")
-)
-
 
 def main():
     if len(sys.argv) < 1 or not Path(sys.argv[1]).resolve().exists():
@@ -34,10 +26,10 @@ def main():
     for url in url_list:
         url = url.strip()
         print(url)
-        url_parse = UrlParse(url=url, basic_dirpath=basic_dirpath, item_div_class="tovar")
+        url_parse = UrlParse(url=url, basic_dirpath=basic_dirpath, item_div_class="gallery-block-top")
         url_parse.download_text()
         url_parse.download_images()
-        row = url_parse.get_row(body_patterns=BODY_PATTERNS)
+        row = url_parse.get_row(body_patterns=None)
         if not is_header:
             excel_file.add_row(list(row.keys()))
             is_header = True
