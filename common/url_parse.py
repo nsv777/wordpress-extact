@@ -1,3 +1,4 @@
+import json
 import os
 import re
 from pathlib import Path
@@ -8,16 +9,16 @@ from bs4 import BeautifulSoup
 
 
 class UrlParse(object):
-    def __init__(self, url, basic_dirpath, item_div_class):
+    def __init__(self, url: str, basic_dirpath: str, find_attrs: json):
         self.url = url
         self.base_url = self._get_base_url(url=url)
-        self.div_item = self._get_div_item(item_div_class=item_div_class)
+        self.div_item = self._get_div_item(find_attrs=find_attrs)
         self.dirpath = self._get_dirpath(url=url, basic_dirpath=basic_dirpath)
 
-    def _get_div_item(self, item_div_class):
+    def _get_div_item(self, find_attrs: json):
         req_get = requests.Session().get(url=self.url)
         soup = BeautifulSoup(req_get.content, "lxml")
-        return soup.find("div", {"class": item_div_class})
+        return soup.find(name="div", attrs=find_attrs)
 
     @staticmethod
     def _get_base_url(url):
@@ -31,39 +32,14 @@ class UrlParse(object):
 
     def get_images_list(self):
         img_list = list()
-        for dt in self.div_item.find_all("dt", {"class": "gallery-icon"}):
-            a_href = dt.find("a").attrs.get("href", None)
-            if a_href:
-                img_list.append(self._get_full_img_url(a_href))
 
-        # for img in self.div_item.findAll("img"):
-        #     img_src = img.attrs.get("src", None)
-        #     if "/wp-content/" in img_src:
-        #         img_list.append(img_src)
-        #
-        #     img_srcset = img.attrs.get("srcset", None)
-        #     if img_srcset is not None:
-        #         for srcset_item in re.findall(r'(https?://\S+)', img_srcset):
-        #             img_list.append(srcset_item)
-
-        for img in self.div_item.find_all("img", {"class": ["aligncenter", "size-full"]}):
+        # -------------------------------------------------
+        # Replace with your own logic
+        for img in self.div_item.find_all(name="img"):
             img_src = img.attrs.get("src", None)
-            if "/wp-content/" in img_src:
+            if img_src:
                 img_list.append(img_src)
-
-        # salon-kuhon-nomer-odin
-        for item_image in self.div_item.find_all(name=None, attrs={"class": ["gallery-slider-image-big", "gallery-slider-image-one"]}):
-            if item_image.name == "img":
-                img = item_image
-            else:
-                img = item_image.find("img")
-            if img:
-                img_src = img.get("data-src", None)
-                if img_src:
-                    img_list.append(img_src)
-                img_src = img.get("src", None)
-                if img_src:
-                    img_list.append(img_src)
+        # -------------------------------------------------
 
         checked_img_list = list()
         for img_src in img_list:
@@ -129,7 +105,7 @@ class UrlParse(object):
                     if not row.get(body_pattern[0], None):
                         match = re.search(body_pattern[1], line, flags=re.IGNORECASE)
                         if match:
-                            row[body_pattern[0]] = match.group(1)
+                            row[body_pattern[0]] = match.group(1).strip()
                         else:
                             row[body_pattern[0]] = ""
             except TypeError:  # no body patterns

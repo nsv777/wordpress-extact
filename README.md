@@ -7,10 +7,7 @@ pip install -r requirements.txt
 ```
 
 ### Configuration
-```
-cp config.json.example config.json
-```
-Modify _body_patterns_ entries in config.json
+Modify BODY_PATTERNS entries in the script, write your own get_images_list method and you're good to go
 
 ##### body_patterns:
 List of column names of the to-be created spreadsheet along with regexp which should extract required info from html body.

@@ -5,6 +5,13 @@ from common.excel_file import ExcelFile
 from common.url_parse import UrlParse
 from common.utils import get_basic_dirpath
 
+BODY_PATTERNS = (
+    ("Ширина", "^Ширина: ?(.*)$"),
+    ("Высота", "^Высота: ?(.*)$"),
+    ("Глубина", "^Глубина: ?(.*)$"),
+    ("Цена", "^Цена от (.*)$")
+)
+
 
 class MyUrlParse(UrlParse):
     def __init__(self, url, basic_dirpath, find_attrs):
@@ -13,19 +20,10 @@ class MyUrlParse(UrlParse):
     def get_images_list(self):
         img_list = list()
         # -------------------------------------------------
-        for item_image in self.div_item.find_all(
-                name=None, attrs={"class": ["gallery-slider-image-big", "gallery-slider-image-one"]}):
-            if item_image.name == "img":
-                img = item_image
-            else:
-                img = item_image.find("img")
-            if img:
-                img_src = img.get("data-src", None)
-                if img_src:
-                    img_list.append(img_src)
-                img_src = img.get("src", None)
-                if img_src:
-                    img_list.append(img_src)
+        for a in self.div_item.find_all(name="a", attrs={"class": "thumbnail"}):
+            a_href = a.get("href", None)
+            if a_href:
+                img_list.append(a_href)
         # -------------------------------------------------
         checked_img_list = list()
         for img_src in img_list:
@@ -55,10 +53,14 @@ def main():
     for url in url_list:
         url = url.strip()
         print(url)
-        url_parse = MyUrlParse(url=url, basic_dirpath=basic_dirpath, find_attrs={"class": "gallery-block-top"})
+        url_parse = MyUrlParse(
+            url=url,
+            basic_dirpath=basic_dirpath,
+            find_attrs={"itemtype": "http://schema.org/Product"}
+        )
         url_parse.download_text()
         url_parse.download_images()
-        row = url_parse.get_row(body_patterns=None)
+        row = url_parse.get_row(body_patterns=BODY_PATTERNS)
         if not is_header:
             excel_file.add_row(list(row.keys()))
             is_header = True
