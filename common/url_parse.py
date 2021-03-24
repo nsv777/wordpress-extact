@@ -9,16 +9,16 @@ from bs4 import BeautifulSoup
 
 
 class UrlParse(object):
-    def __init__(self, url: str, basic_dirpath: str, find_attrs: json):
+    def __init__(self, url: str, basic_dirpath: str, find_attrs: json, item_number=0):
         self.url = url
         self.base_url = self._get_base_url(url=url)
-        self.div_item = self._get_div_item(find_attrs=find_attrs)
+        self.div_item = self._get_div_item(find_attrs=find_attrs, item_number=item_number)
         self.dirpath = self._get_dirpath(url=url, basic_dirpath=basic_dirpath)
 
-    def _get_div_item(self, find_attrs: json):
+    def _get_div_item(self, find_attrs: json, item_number: int):
         req_get = requests.Session().get(url=self.url)
         soup = BeautifulSoup(req_get.content, "lxml")
-        return soup.find(name="div", attrs=find_attrs)
+        return soup.find_all(name="div", attrs=find_attrs)[item_number]
 
     @staticmethod
     def _get_base_url(url):
