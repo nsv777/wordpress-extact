@@ -110,11 +110,11 @@ class UrlParse(object):
                             row[body_pattern[0]] = ""
             except TypeError:  # no body patterns
                 pass
-        row["Картинки"] = "{}".format(",".join(self.get_images_list()[1:]))
+        row["Картинки"] = "{}".format(",".join(self.get_images_list()[0:]))
 
         description = ""
         for line in self.div_item.find_all("p"):
-            description += line.text
+            description += "{}\n".format(line.text)
         row["Описание"] = self.get_stripped_text(multiline_text=description)
 
         return row
